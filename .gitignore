@@ -1,0 +1,23 @@
+# Terraform
+**/.terraform/*
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraformrc
+terraform.rc
+
+# Tools
+.terraform-docs.yml
+.tflint.hcl
+.trivyignore
+
+# Local editors/macos files
+.DS_Store
+.idea
+
+# Others
+compose.yml
+Makefile
+terraform-aws-spa.drawio
+terraform-aws-spa.drawio.crswap
