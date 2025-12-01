@@ -1,8 +1,11 @@
 # Terraform AWS SPA Module
+
 ## Diagram
+
 ![Module Diagram](diagram.png)
 
 ## Overview
+
 This module creates a private S3 bucket, an ACM certificate for your custom domain (if provided, otherwise it would use the CloudFront default certificate), a CloudFront distribution, a KMS key to encrypt the S3 bucket (optional), and an IAM role with the necessary permissions for GitHub to perform three actions:
 
 1. Authenticate with AWS using OIDC and assume the IAM role
@@ -12,27 +15,33 @@ This module creates a private S3 bucket, an ACM certificate for your custom doma
 The module is designed primarily to provide the infrastructure for hosting a static website, ensuring modern standards and enhanced security, all while minimizing costs to a minimum.
 
 ## Usage
+
 ### Terraform
+
 #### Using your own public domain (recommended)
 
-```
+```hcl
 module "this" {
   source  = "dsarrias/terraform-aws-spa"
-  version = "~> 1.0"
 
   providers = {
-    aws         = aws
-    aws.useast1 = aws.useast1   # Needed for the ACM certificate
+    aws.useast1 = aws.useast1
   }
 
   bucket_name    = var.bucket_name
   domain         = var.domain
   web_repository = var.web_repository
 }
+
+provider "aws" {
+  alias  = "useast1"
+  region = "us-east-1"
+}
+
 ```
 
 If you provided your own domain using the variable `domain`, then first apply only the ACM certificate using the `-target` flag, like:
-```
+```hcl
 terraform apply -target="module.this.aws_acm_certificate.this[0]"
 ```
 
@@ -41,10 +50,15 @@ terraform apply -target="module.this.aws_acm_certificate.this[0]"
  The reason behind this is that CloudFront will expect the ACM certificate to be ready. However, since this resource won't be available until the validation process is complete, the apply will fail because the CloudFront distribution cannot be created.
 
 #### Using only CloudFront's endpoint and encrypting the bucket with a KMS key
-```
+You can pass any provider, it won't be used. It's just required because the ACM resource needs this.
+
+```hcl
 module "this" {
   source  = "dsarrias/terraform-aws-spa"
-  version = "~> 1.0"
+
+  providers = {
+    aws.useast1 = aws
+  }
 
   bucket_name    = var.bucket_name
   web_repository = var.web_repository
@@ -52,25 +66,9 @@ module "this" {
 }
 ```
 
-#### Recommended outputs
-Using the optional outputs will prompt you the CNAME records you need right after the apply, but you can also get this from the AWS Console.
-
-```
-# Optional
-output "acm_validation_record" {
-  description = "CNAME value you need to add in your DNS registry to validate the ACM certificate in case of using your own domain."
-  value       = module.this.acm_validation_record
-}
-
-# Optional
-output "cloudfront_domain_name" {
-  description = "CloudFront distribution domain name. This is the endpoint for the website."
-  value       = module.this.cloudfront_domain_name
-}
-```
-
 ### GitHub
-This part will create a workflow that will be triggered every time a change in the directory of the website files occurs in the main branch.
+
+This part will create a workflow that will be triggered every time a change in the directory of the website's files occurs in the main branch.
 
 You are free to integrate the workflow insise the same repository as the Terraform code or isolate the website code in a different one.
 
@@ -82,7 +80,7 @@ You are free to integrate the workflow insise the same repository as the Terrafo
     - `CLOUDFRONT_DIST_ID`
 3. Add the next block in your repository under `.github/workflows/deploy.yml` or go to Actions > New workflow and save it there. Make sure you change the values mentioned with the comment `# Change this`.
 
-```
+```yml
 name: Deploy to S3 and Invalidate CloudFront
 
 on:
