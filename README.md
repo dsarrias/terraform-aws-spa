@@ -2,7 +2,9 @@
 
 ## Diagram
 
-![Module Diagram](diagram.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dsarrias/terraform-aws-spa/main/diagram.png" alt="Module Diagram">
+</p>
 
 ## Overview
 
@@ -22,7 +24,7 @@ The module is designed primarily to provide the infrastructure for hosting a sta
 
 ```hcl
 module "this" {
-  source  = "dsarrias/terraform-aws-spa"
+  source  = "dsarrias/spa/aws"
 
   providers = {
     aws.useast1 = aws.useast1
@@ -54,7 +56,7 @@ You can pass any provider, it won't be used. It's just required because the ACM 
 
 ```hcl
 module "this" {
-  source  = "dsarrias/terraform-aws-spa"
+  source  = "dsarrias/spa/aws"
 
   providers = {
     aws.useast1 = aws
