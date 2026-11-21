@@ -1,0 +1,15 @@
+---
+formatter: markdown
+sort:
+  enabled: true
+content: |-
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}

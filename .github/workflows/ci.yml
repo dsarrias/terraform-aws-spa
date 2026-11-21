@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    container:
+      image: dsarrias/iac-toolbox:wolfi-v1.4.0@sha256:6e217aa50ea139697a2eca3924b009a88ae0dfbc79c336678746c9948a962cd1
+      options: --user root
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: fmt
+        run: terraform fmt -check -recursive -diff
+
+      - name: init
+        run: terraform init -backend=false -input=false
+
+      - name: tflint
+        run: tflint --init -c .tflint.hcl && tflint -c .tflint.hcl
+
+      - name: trivy
+        run: trivy config --exit-code 1 --skip-version-check .
+
+      - name: docs
+        run: terraform-docs markdown table . --output-file README.md --lockfile=false --output-check
+
+      - name: test
+        run: terraform test
