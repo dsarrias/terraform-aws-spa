@@ -12,6 +12,7 @@ resource "aws_cloudfront_distribution" "this" {
   http_version        = var.http_version
   aliases             = [var.domain]
   price_class         = var.price_class
+  web_acl_id          = var.create_waf ? aws_wafv2_web_acl.this[0].arn : null
 
   origin {
     domain_name              = aws_s3_bucket.this.bucket_regional_domain_name
@@ -38,6 +39,15 @@ resource "aws_cloudfront_distribution" "this" {
     cache_policy_id        = data.aws_cloudfront_cache_policy.this.id
   }
 
+  dynamic "logging_config" {
+    for_each = var.enable_cloudfront_logging ? [1] : []
+
+    content {
+      bucket = aws_s3_bucket.logs[0].bucket_domain_name
+      prefix = "cloudfront/"
+    }
+  }
+
   restrictions {
     geo_restriction {
       restriction_type = "none"
@@ -57,4 +67,6 @@ resource "aws_cloudfront_distribution" "this" {
     response_code         = var.custom_error_response.response_code
     response_page_path    = var.custom_error_response.response_page_path
   }
+
+  depends_on = [aws_s3_bucket_ownership_controls.logs]
 }

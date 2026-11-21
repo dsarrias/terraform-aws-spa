@@ -23,6 +23,33 @@ data "aws_iam_policy_document" "s3" {
   }
 }
 
+data "aws_iam_policy_document" "logs" {
+  count = var.enable_s3_logging ? 1 : 0
+
+  statement {
+    effect = "Allow"
+
+    principals {
+      identifiers = ["logging.s3.amazonaws.com"]
+      type        = "Service"
+    }
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.logs[0].arn}/s3/*"]
+
+    condition {
+      test     = "ArnLike"
+      values   = [aws_s3_bucket.this.arn]
+      variable = "aws:SourceArn"
+    }
+
+    condition {
+      test     = "StringEquals"
+      values   = [data.aws_caller_identity.current.account_id]
+      variable = "aws:SourceAccount"
+    }
+  }
+}
+
 data "aws_iam_policy_document" "kms" {
   statement {
     effect    = "Allow"

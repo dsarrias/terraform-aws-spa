@@ -103,3 +103,45 @@ variable "cache_policy" {
   type        = string
   default     = "Managed-CachingOptimized"
 }
+
+# WAF
+variable "create_waf" {
+  description = "If enabled it will create a WAF web ACL (per-IP rate limiting + AWS managed rule groups) attached to the CloudFront distribution. Adds recurring cost, see README."
+  type        = bool
+  default     = false
+}
+
+variable "waf_rate_limit" {
+  description = "Maximum requests allowed per client IP in a 5-minute window before WAF blocks it. Only used when `create_waf` is `true`."
+  type        = number
+  default     = 2000
+
+  validation {
+    condition     = var.waf_rate_limit >= 10 && var.waf_rate_limit <= 2000000000
+    error_message = "`waf_rate_limit` must be between 10 and 2000000000."
+  }
+}
+
+# Access logging
+variable "enable_cloudfront_logging" {
+  description = "If enabled CloudFront access logs are delivered to a dedicated `<bucket>-logs` S3 bucket under `cloudfront/`. Delivery is free, storage is billed, see README."
+  type        = bool
+  default     = false
+}
+
+variable "enable_s3_logging" {
+  description = "If enabled S3 server access logs of the website bucket are delivered to a dedicated `<bucket>-logs` S3 bucket under `s3/`. Delivery is free, storage is billed, see README."
+  type        = bool
+  default     = false
+}
+
+variable "access_logs_retention_days" {
+  description = "Days before access logs are deleted from the logs bucket. Only used when any logging variable is `true`."
+  type        = number
+  default     = 30
+
+  validation {
+    condition     = var.access_logs_retention_days >= 1
+    error_message = "`access_logs_retention_days` must be at least 1."
+  }
+}
