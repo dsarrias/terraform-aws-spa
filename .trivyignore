@@ -1,0 +1,6 @@
+# Bucket versioning: site content is rebuilt from the web repository
+AVD-AWS-0090
+
+# Access logging is opt-in (enable_cloudfront_logging / enable_s3_logging) because storage is billed
+AVD-AWS-0010
+AVD-AWS-0089

@@ -10,6 +10,6 @@ resource "aws_kms_key" "this" {
 resource "aws_kms_alias" "this" {
   count = var.kms_key_id == null && var.create_kms_key != false ? 1 : 0
 
-  name          = "alias/${var.bucket_name != null ? var.bucket_name : "${var.namespace}-${random_id.this[0].hex}"}"
+  name          = "alias/${replace(var.bucket_name != null ? var.bucket_name : "${var.namespace}-${random_id.this[0].hex}", ".", "-")}"
   target_key_id = aws_kms_key.this[0].key_id
 }
