@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/dsarrias/terraform-aws-spa/compare/v0.1.0...v0.2.0) (2026-11-22)
+
+
+### Features
+
+* Add optional WAF, access logging and PR CI ([#4](https://github.com/dsarrias/terraform-aws-spa/issues/4)) ([a530188](https://github.com/dsarrias/terraform-aws-spa/commit/a530188216e9ece337caf519e51a463c750eb196))
+
 ## 0.1.0 (2025-12-01)
 
 
