@@ -14,5 +14,4 @@ terraform.rc
 # Others
 compose.yml
 Makefile
-terraform-aws-spa.drawio
-terraform-aws-spa.drawio.crswap
+*.crswap
